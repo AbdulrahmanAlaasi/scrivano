@@ -1,5 +1,5 @@
 import type { Meeting, Settings } from '../shared/types';
-import { DEFAULT_SETTINGS } from '../shared/types';
+import { migrateSettings } from '../shared/types';
 
 const DB_NAME = 'scrivano';
 const DB_VERSION = 1;
@@ -73,7 +73,7 @@ export async function loadSettings(): Promise<Settings> {
   const tx = db.transaction('settings', 'readonly');
   return new Promise((resolve, reject) => {
     const req = tx.objectStore('settings').get('settings');
-    req.onsuccess = () => resolve({ ...DEFAULT_SETTINGS, ...((req.result as Partial<Settings>) ?? {}) });
+    req.onsuccess = () => resolve(migrateSettings((req.result as Partial<Settings>) ?? {}));
     req.onerror = () => reject(req.error);
   });
 }

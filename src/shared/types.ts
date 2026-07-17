@@ -33,13 +33,27 @@ export interface Meeting {
 }
 
 export interface Settings {
-  ollamaUrl: string;
-  ollamaModel: string;
+  /** Custom local AI server URL. Empty string = auto-detect Ollama / LM Studio / Jan / llamafile. */
+  llmUrl: string;
+  llmModel: string;
   whisperModel: string;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
-  ollamaUrl: 'http://localhost:11434',
-  ollamaModel: '',
+  llmUrl: '',
+  llmModel: '',
   whisperModel: 'onnx-community/whisper-base',
 };
+
+/** Migrate settings stored by earlier versions that were Ollama-specific. */
+export function migrateSettings(raw: Partial<Settings> & { ollamaUrl?: string; ollamaModel?: string }): Settings {
+  const llmUrl =
+    raw.llmUrl ??
+    // The old default pointed explicitly at Ollama; treat it as "auto-detect" now.
+    (raw.ollamaUrl && raw.ollamaUrl !== 'http://localhost:11434' ? raw.ollamaUrl : '');
+  return {
+    llmUrl,
+    llmModel: raw.llmModel ?? raw.ollamaModel ?? '',
+    whisperModel: raw.whisperModel ?? DEFAULT_SETTINGS.whisperModel,
+  };
+}

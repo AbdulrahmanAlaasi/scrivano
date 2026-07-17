@@ -1,6 +1,6 @@
 import './style.css';
 import { deleteMeeting, listMeetings, loadSettings, saveMeeting, saveSettings } from './lib/db';
-import { checkOllama, generate, type OllamaStatus } from './lib/ollama';
+import { detectProvider, generate, type ProviderInfo } from './lib/llm';
 import { startRecording, type RecorderHandle, type RecordingSource } from './lib/recorder';
 import { transcribe, type TranscribeProgress } from './lib/transcriber';
 import {
@@ -34,7 +34,7 @@ type View =
 
 let meetings: Meeting[] = [];
 let settings: Settings;
-let ollama: OllamaStatus = { reachable: false, models: [] };
+let provider: ProviderInfo = { reachable: false, kind: 'ollama', url: '', label: 'Local AI', models: [] };
 let view: View = { kind: 'home' };
 let searchQuery = '';
 let recorder: RecorderHandle | null = null;
@@ -67,10 +67,10 @@ async function refreshMeetings() {
   meetings = await listMeetings();
 }
 
-async function refreshOllama() {
-  ollama = await checkOllama(settings.ollamaUrl);
-  if (ollama.reachable && ollama.models.length > 0 && !ollama.models.includes(settings.ollamaModel)) {
-    settings.ollamaModel = ollama.models[0];
+async function refreshProvider() {
+  provider = await detectProvider(settings.llmUrl);
+  if (provider.reachable && provider.models.length > 0 && !provider.models.includes(settings.llmModel)) {
+    settings.llmModel = provider.models[0];
     await saveSettings(settings);
   }
 }
@@ -121,8 +121,8 @@ function render() {
         </nav>
         <div class="sidebar-foot">
           <button type="button" class="ollama-pill" id="open-settings" title="Settings">
-            <span class="status-dot ${ollama.reachable ? 'dot-ok' : 'dot-off'}"></span>
-            <span>${ollama.reachable ? `Ollama · ${settings.ollamaModel || 'no model'}` : 'Ollama offline'}</span>
+            <span class="status-dot ${provider.reachable ? 'dot-ok' : 'dot-off'}"></span>
+            <span>${provider.reachable ? `${provider.label} · ${settings.llmModel || 'no model'}` : 'Local AI offline'}</span>
             <span class="gear" aria-hidden="true">⚙</span>
           </button>
         </div>
@@ -156,7 +156,7 @@ function renderHome(): string {
       <h1>Meeting notes that never leave your machine.</h1>
       <p class="home-sub">
         Record or import a meeting. Scrivano transcribes it on-device with Whisper and writes
-        Notion-style AI notes with your local Ollama model. No cloud, no accounts, no telemetry.
+        Notion-style AI notes with your own local AI model. No cloud, no accounts, no telemetry.
       </p>
       <div class="capture-grid">
         <button type="button" class="capture-card tint-lavender" id="cap-mic">
@@ -263,17 +263,17 @@ function renderNotesTab(m: Meeting): string {
       <div class="notes-empty">
         <p>No AI notes yet for this meeting.</p>
         ${
-          ollama.reachable
+          provider.reachable
             ? `<div class="generate-row">
-                <select id="model-select" class="model-select" aria-label="Ollama model">
-                  ${ollama.models.map((mo) => `<option value="${escapeHtml(mo)}" ${mo === settings.ollamaModel ? 'selected' : ''}>${escapeHtml(mo)}</option>`).join('')}
+                <select id="model-select" class="model-select" aria-label="Local AI model">
+                  ${provider.models.map((mo) => `<option value="${escapeHtml(mo)}" ${mo === settings.llmModel ? 'selected' : ''}>${escapeHtml(mo)}</option>`).join('')}
                 </select>
                 <button type="button" class="btn btn-primary" id="generate-notes" ${generating ? 'disabled' : ''}>${generating ? 'Generating…' : '✦ Generate AI notes'}</button>
               </div>`
             : `<div class="ollama-help">
-                <p><strong>Ollama isn't reachable.</strong> ${escapeHtml(ollama.error ?? '')}</p>
-                <p class="mono-block">1. Install from ollama.com&nbsp;&nbsp;2. <code>ollama pull llama3.2</code>&nbsp;&nbsp;3. Reopen Scrivano</p>
-                <button type="button" class="btn btn-secondary btn-sm" id="retry-ollama">Retry connection</button>
+                <p><strong>No local AI server found.</strong> ${escapeHtml(provider.error ?? '')}</p>
+                <p class="mono-block">Works with <code>Ollama</code>, <code>LM Studio</code>, <code>Jan</code>, <code>llamafile</code>, or any OpenAI-compatible server. Quickest start: install Ollama, then <code>ollama pull llama3.2</code>.</p>
+                <button type="button" class="btn btn-secondary btn-sm" id="retry-ollama">Retry detection</button>
               </div>`
         }
       </div>
@@ -347,15 +347,15 @@ function renderSettingsModal(): string {
           <button type="button" class="modal-close" id="close-settings" aria-label="Close">✕</button>
         </div>
         <label class="field">
-          <span>Ollama URL</span>
-          <input id="set-url" type="text" value="${escapeHtml(settings.ollamaUrl)}" />
+          <span>Local AI server URL (blank = auto-detect Ollama, LM Studio, Jan, llamafile)</span>
+          <input id="set-url" type="text" value="${escapeHtml(settings.llmUrl)}" placeholder="auto-detect" />
         </label>
         <label class="field">
-          <span>Default model ${ollama.reachable ? `(${ollama.models.length} installed)` : '(Ollama offline)'}</span>
+          <span>Default model ${provider.reachable ? `(${provider.models.length} available via ${provider.label})` : '(no local AI server detected)'}</span>
           ${
-            ollama.reachable && ollama.models.length > 0
-              ? `<select id="set-model">${ollama.models.map((mo) => `<option value="${escapeHtml(mo)}" ${mo === settings.ollamaModel ? 'selected' : ''}>${escapeHtml(mo)}</option>`).join('')}</select>`
-              : `<input id="set-model" type="text" value="${escapeHtml(settings.ollamaModel)}" placeholder="llama3.2" />`
+            provider.reachable && provider.models.length > 0
+              ? `<select id="set-model">${provider.models.map((mo) => `<option value="${escapeHtml(mo)}" ${mo === settings.llmModel ? 'selected' : ''}>${escapeHtml(mo)}</option>`).join('')}</select>`
+              : `<input id="set-model" type="text" value="${escapeHtml(settings.llmModel)}" placeholder="llama3.2" />`
           }
         </label>
         <label class="field">
@@ -454,7 +454,7 @@ async function processAudio(blob: Blob, durationSec: number, source: MeetingSour
   view = { kind: 'meeting', id: meeting.id, tab: 'transcript' };
   render();
   showToast('Transcript ready');
-  if (ollama.reachable) void generateNotes(meeting.id);
+  if (provider.reachable) void generateNotes(meeting.id);
 }
 
 async function createFromPaste(text: string) {
@@ -471,15 +471,15 @@ async function createFromPaste(text: string) {
   await refreshMeetings();
   view = { kind: 'meeting', id: meeting.id, tab: 'notes' };
   render();
-  if (ollama.reachable) void generateNotes(meeting.id);
+  if (provider.reachable) void generateNotes(meeting.id);
 }
 
 async function generateNotes(meetingId: string) {
   const meeting = meetings.find((m) => m.id === meetingId);
   if (!meeting || generating) return;
-  const model = (document.querySelector<HTMLSelectElement>('#model-select')?.value ?? settings.ollamaModel).trim();
+  const model = (document.querySelector<HTMLSelectElement>('#model-select')?.value ?? settings.llmModel).trim();
   if (!model) {
-    showToast('Pick an Ollama model first (Settings).');
+    showToast('Pick a local AI model first (Settings).');
     return;
   }
   generating = true;
@@ -487,7 +487,7 @@ async function generateNotes(meetingId: string) {
 
   const transcript = fitTranscript(transcriptToText(meeting.segments));
   try {
-    const response = await generate(settings.ollamaUrl, model, buildNotesPrompt(transcript));
+    const response = await generate(provider, model, buildNotesPrompt(transcript));
     const parsed = parseNotesResponse(response);
     if (!parsed.ok) {
       showToast(`Notes failed: ${parsed.error}`);
@@ -498,7 +498,7 @@ async function generateNotes(meetingId: string) {
     // Auto-title untitled meetings.
     if (meeting.title.startsWith('Meeting — ')) {
       try {
-        const titleRaw = await generate(settings.ollamaUrl, model, buildTitlePrompt(transcript));
+        const titleRaw = await generate(provider, model, buildTitlePrompt(transcript));
         meeting.title = sanitizeTitle(titleRaw);
       } catch {
         /* keep default title */
@@ -509,7 +509,7 @@ async function generateNotes(meetingId: string) {
     if (view.kind === 'meeting' && view.id === meetingId) view = { kind: 'meeting', id: meetingId, tab: 'notes' };
     showToast('AI notes ready ✦');
   } catch (err) {
-    showToast(err instanceof Error ? err.message : 'Ollama request failed.');
+    showToast(err instanceof Error ? err.message : 'Local AI request failed.');
   } finally {
     generating = false;
     render();
@@ -543,7 +543,7 @@ function wireEvents() {
 
   document.querySelector('#open-settings')?.addEventListener('click', async () => {
     settingsOpen = true;
-    await refreshOllama();
+    await refreshProvider();
     render();
   });
 
@@ -560,11 +560,11 @@ function wireEvents() {
   });
 
   document.querySelector('#save-settings')?.addEventListener('click', async () => {
-    settings.ollamaUrl = (document.querySelector<HTMLInputElement>('#set-url')?.value ?? settings.ollamaUrl).trim();
-    settings.ollamaModel = (document.querySelector<HTMLInputElement | HTMLSelectElement>('#set-model')?.value ?? '').trim();
+    settings.llmUrl = (document.querySelector<HTMLInputElement>('#set-url')?.value ?? settings.llmUrl).trim();
+    settings.llmModel = (document.querySelector<HTMLInputElement | HTMLSelectElement>('#set-model')?.value ?? '').trim();
     settings.whisperModel = document.querySelector<HTMLSelectElement>('#set-whisper')?.value ?? settings.whisperModel;
     await saveSettings(settings);
-    await refreshOllama();
+    await refreshProvider();
     settingsOpen = false;
     render();
     showToast('Settings saved');
@@ -640,9 +640,9 @@ function wireEvents() {
     if (view.kind === 'meeting') void generateNotes(view.id);
   });
   document.querySelector('#retry-ollama')?.addEventListener('click', async () => {
-    await refreshOllama();
+    await refreshProvider();
     render();
-    showToast(ollama.reachable ? 'Ollama connected' : 'Still unreachable');
+    showToast(provider.reachable ? `${provider.label} connected` : 'Still no local AI server found');
   });
 
   document.querySelectorAll<HTMLInputElement>('[data-action-idx]').forEach((cb) => {
@@ -693,7 +693,7 @@ async function boot() {
   settings = await loadSettings();
   await refreshMeetings();
   render();
-  await refreshOllama();
+  await refreshProvider();
   render();
 }
 
