@@ -1,0 +1,7 @@
+django>=6.0,<7
+djangorestframework>=3.16
+dj-database-url>=2.3
+psycopg[binary]>=3.2
+pgvector>=0.4
+pytest>=8
+pytest-django>=4.11
