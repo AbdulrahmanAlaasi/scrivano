@@ -31,6 +31,7 @@ INSTALLED_APPS = [
     "tenancy",
     "groups",
     "meetings",
+    "intelligence",
 ]
 
 MIDDLEWARE = [
