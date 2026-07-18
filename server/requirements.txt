@@ -3,5 +3,7 @@ djangorestframework>=3.16
 dj-database-url>=2.3
 psycopg[binary]>=3.2
 pgvector>=0.4
+python-dotenv>=1.0
+PyJWT>=2.9
 pytest>=8
 pytest-django>=4.11

@@ -27,3 +27,4 @@ server/.venv/
 server/db.sqlite3
 __pycache__/
 *.pyc
+server/.env

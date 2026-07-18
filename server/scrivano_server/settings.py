@@ -9,8 +9,12 @@ import os
 from pathlib import Path
 
 import dj_database_url
+from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Local secrets live in server/.env (gitignored); production uses real env vars.
+load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key")
 DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
@@ -69,8 +73,8 @@ AUTH_USER_MODEL = "tenancy.User"
 REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.IsAuthenticated"],
     "DEFAULT_AUTHENTICATION_CLASSES": [
+        "tenancy.authentication.SupabaseJWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
-        # Supabase JWT authentication is added in the auth increment.
     ],
 }
 
