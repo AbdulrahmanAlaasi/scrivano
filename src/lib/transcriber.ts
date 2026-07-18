@@ -59,6 +59,15 @@ async function getPipeline(modelId: string, onProgress: ProgressCallback): Promi
   for (const dtype of preferredDtypes()) {
     try {
       const p = await createPipeline(modelId, dtype, onProgress);
+      // ONNX sessions can be created lazily on the first inference call, so a broken
+      // quantized model may load "successfully" and only blow up when transcription
+      // starts. Run a tiny warmup inference here to force session creation while we
+      // are still inside the fallback ladder.
+      onProgress({ phase: 'loading-model', progress: -1, detail: 'Verifying speech model…' });
+      await (p as (audio: Float32Array, options: Record<string, unknown>) => Promise<unknown>)(
+        new Float32Array(16000),
+        {}
+      );
       localStorage.setItem(DTYPE_CACHE_KEY, dtype);
       cachedPipeline = p;
       cachedKey = key;
@@ -102,7 +111,7 @@ export async function transcribe(
   onProgress: ProgressCallback
 ): Promise<TranscriptSegment[]> {
   onProgress({ phase: 'loading-model', progress: -1, detail: 'Preparing speech model…' });
-  const transcriber = (await getPipeline(modelId, onProgress)) as (
+  let transcriber = (await getPipeline(modelId, onProgress)) as (
     audio: Float32Array,
     options: Record<string, unknown>
   ) => Promise<ChunkOutput>;
@@ -136,7 +145,28 @@ export async function transcribe(
       options.task = 'transcribe';
     }
 
-    const result = await transcriber(chunk as Float32Array, options);
+    let result: ChunkOutput;
+    try {
+      result = await transcriber(chunk as Float32Array, options);
+    } catch (err) {
+      // Last line of defense: a session error escaped the load-time ladder (e.g. a
+      // stale cached pipeline from before a dtype switch). Rebuild at full precision
+      // once, then retry this chunk.
+      if (localStorage.getItem(DTYPE_CACHE_KEY) !== 'fp32') {
+        cachedPipeline = null;
+        cachedKey = null;
+        localStorage.setItem(DTYPE_CACHE_KEY, 'fp32');
+        onProgress({
+          phase: 'loading-model',
+          progress: -1,
+          detail: 'Optimized model failed on this device — retrying with full precision…',
+        });
+        transcriber = (await getPipeline(modelId, onProgress)) as typeof transcriber;
+        result = await transcriber(chunk as Float32Array, options);
+      } else {
+        throw err;
+      }
+    }
 
     if (result.chunks && result.chunks.length > 0) {
       for (const c of result.chunks) {
