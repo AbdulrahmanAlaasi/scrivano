@@ -880,6 +880,59 @@ h3 {
 
 /* ---------- toast ---------- */
 
+/* ---------- Cloud workspace (Scrivano 2.0, increment 12) ---------- */
+.cloud-pane {
+  padding: 24px 32px;
+  max-width: 880px;
+  margin: 0 auto;
+  overflow-y: auto;
+  height: 100%;
+}
+.cloud-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.cloud-nav { display: flex; gap: 6px; flex-wrap: wrap; }
+.cloud-hint { color: var(--text-dim, #8a8f98); font-size: 0.9rem; margin: 8px 0; }
+.cloud-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
+.cloud-form label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.cloud-form input,
+.cloud-row input,
+.cloud-row select {
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #2a2d35);
+  background: var(--bg-raised, #1a1d24);
+  color: inherit;
+  font: inherit;
+}
+.cloud-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
+.cloud-row input { flex: 1; min-width: 160px; }
+.cloud-section { margin-bottom: 28px; }
+.cloud-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.cloud-card {
+  border: 1px solid var(--border, #2a2d35);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--bg-raised, #1a1d24);
+}
+.cloud-conflict { border-color: #b3862d; }
+.cloud-table { width: 100%; border-collapse: collapse; }
+.cloud-table td { padding: 6px 8px; border-bottom: 1px solid var(--border, #2a2d35); }
+.btn-small { padding: 4px 10px; font-size: 0.8rem; }
+.btn-link { background: none; border: none; color: var(--accent, #7aa2f7); cursor: pointer; padding: 0; font: inherit; text-align: left; }
+.btn-link:hover { text-decoration: underline; }
+.pill-warn { background: #4a3a12; color: #e8c268; }
+.chat-log { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
+.chat-msg { padding: 10px 12px; border-radius: 10px; max-width: 85%; }
+.chat-user { align-self: flex-end; background: var(--accent-dim, #22314f); }
+.chat-assistant { align-self: flex-start; background: var(--bg-raised, #1a1d24); border: 1px solid var(--border, #2a2d35); }
+.cloud-body h4 { margin: 18px 0 6px; }
+
 .toast {
   position: fixed;
   bottom: 1.4rem;
