@@ -105,6 +105,53 @@ class Person(WorkspaceScopedModel):
         return self.name
 
 
+class GroupDocument(WorkspaceScopedModel):
+    """Uploaded knowledge (spec §5 step 7). Files live in private storage;
+    chunks are indexed for Group Intelligence retrieval only — never for
+    Meeting Chat (spec §26)."""
+
+    class Status(models.TextChoices):
+        UPLOADED = "uploaded"
+        INDEXING = "indexing"
+        INDEXED = "indexed"
+        FAILED = "failed"
+
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="documents")
+    filename = models.CharField(max_length=300)
+    mime_type = models.CharField(max_length=100)
+    size_bytes = models.PositiveBigIntegerField(default=0)
+    storage_path = models.CharField(max_length=500)
+    status = models.CharField(max_length=16, choices=Status.choices, default=Status.UPLOADED)
+    error = models.TextField(blank=True)
+    embedding_provider = models.CharField(max_length=32, blank=True)
+    is_superseded = models.BooleanField(default=False)
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self) -> str:
+        return self.filename
+
+
+class DocumentChunk(WorkspaceScopedModel):
+    document = models.ForeignKey(
+        GroupDocument, on_delete=models.CASCADE, related_name="chunks"
+    )
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="chunks")
+    sequence = models.PositiveIntegerField()
+    text = models.TextField()
+    heading = models.CharField(max_length=300, blank=True)
+    # JSON list of floats; mirrored into a pgvector column on Postgres for ANN
+    # search. Keeping the JSON copy means SQLite dev keeps working.
+    embedding = models.JSONField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["sequence"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["document", "sequence"], name="uniq_document_chunk_sequence"
+            )
+        ]
+
+
 class GroupPerson(TimeStampedModel):
     group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name="people")
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name="groups")

@@ -76,7 +76,34 @@ REST_FRAMEWORK = {
         "tenancy.authentication.SupabaseJWTAuthentication",
         "rest_framework.authentication.SessionAuthentication",
     ],
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {"anon": "60/hour", "user": "2000/hour", "upload": "60/hour"},
 }
+
+# Production hardening (ECC django-security checklist): everything below only
+# activates when DEBUG is off, so local development stays friction-free.
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    CSRF_COOKIE_SAMESITE = "Lax"
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = "DENY"
+    if SECRET_KEY == "dev-only-insecure-key":
+        raise RuntimeError("DJANGO_SECRET_KEY must be set in production.")
+
+# Document uploads (spec §5 step 7): validated by magic bytes + size.
+MAX_DOCUMENT_BYTES = 25 * 1024 * 1024
+MEDIA_ROOT = BASE_DIR / "media"  # local storage backend; Supabase bucket in prod
+DOCUMENT_STORAGE = os.environ.get("DOCUMENT_STORAGE", "local")  # local | supabase
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"

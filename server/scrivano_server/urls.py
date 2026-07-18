@@ -4,11 +4,13 @@ from rest_framework.routers import DefaultRouter
 
 from groups.api import GroupViewSet
 from groups.context_api import GroupContextViewSet
+from groups.documents_api import GroupDocumentViewSet
 from tenancy.api import WorkspaceViewSet
 
 router = DefaultRouter()
 router.register("workspaces", WorkspaceViewSet, basename="workspace")
 router.register("groups", GroupViewSet, basename="group")
+router.register("documents", GroupDocumentViewSet, basename="document")
 
 context_list = GroupContextViewSet.as_view({"get": "list"})
 context_set = GroupContextViewSet.as_view({"put": "set"})
