@@ -3,12 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sard (سرد) · AI meeting notes that stay yours</title>
-<meta name="description" content="Sard turns meetings into structured, cited notes, decisions and tasks. Transcription runs in your browser, AI runs on your machine, and organizational memory only exists when you approve it.">
+<title>Sard (سرد) · local AI meeting notes</title>
+<meta name="description" content="Sard turns meetings into structured, cited notes, decisions and tasks. It runs entirely on your machine: transcription in your browser, AI on your hardware. Free and open source.">
 <link rel="icon" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,640&family=Noto+Naskh+Arabic:wght@500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Noto+Naskh+Arabic:wght@500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --primary:#b3541e; --primary-pressed:#94431a; --on-primary:#fff8ef;
@@ -22,87 +22,79 @@
   * { margin:0; box-sizing:border-box; }
   html { scroll-behavior:smooth; }
   body { background:var(--canvas); color:var(--ink); font:16px/1.65 'Inter',system-ui,sans-serif; }
-  .wrap { max-width:1020px; margin:0 auto; padding:0 24px; }
+  .wrap { max-width:1000px; margin:0 auto; padding:0 24px; }
   a { color:inherit; }
 
-  header.site {
-    position:sticky; top:0; z-index:10; backdrop-filter:blur(10px);
-    background:color-mix(in srgb, var(--canvas) 86%, transparent);
-    border-bottom:1px solid var(--hairline);
-  }
+  header.site { position:sticky; top:0; z-index:10; background:rgba(250,246,239,.92); backdrop-filter:blur(10px); border-bottom:1px solid var(--hairline); }
   .nav { display:flex; justify-content:space-between; align-items:center; padding:14px 0; }
-  .brand { display:flex; align-items:baseline; gap:8px; font-family:var(--display); font-weight:640; font-size:1.25rem; }
-  .brand img { width:26px; height:26px; align-self:center; border-radius:7px; }
+  .brand { display:flex; align-items:center; gap:9px; font-family:var(--display); font-weight:600; font-size:1.25rem; }
+  .brand img { width:27px; height:27px; border-radius:7px; }
   .brand .ar { font-family:var(--arabic); color:var(--primary); font-size:1.05rem; }
-  .nav-links { display:flex; gap:8px; align-items:center; }
+  .nav-links { display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
   .nav-links a { color:var(--slate); text-decoration:none; padding:8px 12px; border-radius:8px; font-size:0.92rem; }
   .nav-links a:hover { background:var(--surface); color:var(--ink); }
 
-  .btn { display:inline-block; padding:12px 22px; border-radius:12px; text-decoration:none; font-weight:600;
-         transition:transform .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease); }
+  .btn { display:inline-block; padding:13px 24px; border-radius:12px; text-decoration:none; font-weight:600;
+         transition:transform .18s var(--ease), box-shadow .18s var(--ease), background .18s var(--ease), border-color .18s var(--ease); }
   .btn-primary { background:var(--primary); color:var(--on-primary); }
   .btn-primary:hover { background:var(--primary-pressed); transform:translateY(-2px); box-shadow:0 8px 22px rgba(179,84,30,.3); }
   .btn-ghost { border:1.5px solid var(--hairline-strong); color:var(--ink); }
   .btn-ghost:hover { border-color:var(--ink); transform:translateY(-2px); }
 
-  .hero { padding:88px 0 56px; text-align:center; }
+  .hero { padding:84px 0 30px; text-align:center; }
   .hero .kicker { font-family:var(--arabic); color:var(--primary); font-size:1.5rem; display:block; margin-bottom:14px; }
-  .hero h1 { font-family:var(--display); font-weight:640; font-size:clamp(2.3rem,5.6vw,3.9rem); line-height:1.08; letter-spacing:-0.02em; }
+  .hero h1 { font-family:var(--display); font-weight:600; font-size:clamp(2.3rem,5.6vw,3.8rem); line-height:1.08; letter-spacing:-0.02em; }
   .hero h1 em { font-style:italic; color:var(--primary); }
   .hero p.sub { color:var(--slate); max-width:640px; margin:22px auto 0; font-size:1.12rem; }
-  .cta { margin-top:34px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .microproof { margin-top:16px; color:var(--steel); font-size:0.85rem; }
+  .cta { margin-top:32px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .microproof { margin-top:15px; color:var(--steel); font-size:0.85rem; }
 
-  .marquee { border-block:1px solid var(--hairline); padding:14px 0; color:var(--steel); font-size:0.88rem; text-align:center; background:var(--soft); }
+  .terminal { max-width:560px; margin:40px auto 0; background:var(--ink); color:#e8dfcf; border-radius:14px;
+              padding:18px 22px; text-align:left; font:0.88rem/1.9 ui-monospace,'Cascadia Code',Consolas,monospace;
+              box-shadow:0 18px 44px rgba(34,29,22,.18); }
+  .terminal .dots { display:flex; gap:6px; margin-bottom:10px; }
+  .terminal .dots span { width:10px; height:10px; border-radius:50%; background:#57503f; }
+  .terminal .dots span:first-child { background:var(--primary); }
+  .terminal .c { color:#a89d87; }
+
+  .marquee { border-block:1px solid var(--hairline); padding:14px 0; color:var(--steel); font-size:0.88rem; text-align:center; background:var(--soft); margin-top:56px; }
 
   section.block { padding:72px 0; }
-  .block h2 { font-family:var(--display); font-weight:600; font-size:clamp(1.7rem,3.4vw,2.4rem); letter-spacing:-0.015em; max-width:560px; }
-  .block p.lead { color:var(--slate); max-width:560px; margin-top:12px; }
-  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:36px; }
+  .block h2 { font-family:var(--display); font-weight:600; font-size:clamp(1.7rem,3.4vw,2.4rem); letter-spacing:-0.015em; max-width:600px; }
+  .block p.lead { color:var(--slate); max-width:600px; margin-top:12px; }
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:18px; margin-top:36px; }
   .card { background:var(--soft); border:1px solid var(--hairline); border-radius:18px; padding:26px;
           transition:transform .25s var(--ease), box-shadow .25s var(--ease); }
   .card:hover { transform:translateY(-4px); box-shadow:0 14px 34px rgba(34,29,22,.09); }
   .card .chip { display:inline-flex; width:42px; height:42px; align-items:center; justify-content:center;
                 border-radius:12px; font-size:1.2rem; margin-bottom:14px; }
-  .card h3 { font-size:1.05rem; margin-bottom:8px; font-weight:600; }
+  .card h3 { font-size:1.05rem; margin-bottom:8px; font-weight:600; font-family:'Inter',sans-serif; }
   .card p { color:var(--slate); font-size:0.94rem; }
   .c1 { background:var(--tint-sand); } .c2 { background:var(--tint-sky); }
   .c3 { background:var(--tint-olive); } .c4 { background:var(--tint-peach); }
+
+  .steps { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:18px; margin-top:36px; counter-reset:step; }
+  .step { border-left:3px solid var(--primary); padding:4px 0 4px 18px; }
+  .step::before { counter-increment:step; content:counter(step, decimal-leading-zero); font-family:var(--display);
+                  color:var(--primary); font-size:1.4rem; display:block; margin-bottom:6px; }
+  .step h3 { font-size:1rem; margin-bottom:6px; }
+  .step p { color:var(--slate); font-size:0.92rem; }
 
   .rulebox { background:var(--ink); color:var(--canvas); border-radius:24px; padding:56px 32px; text-align:center; }
   .rulebox blockquote { font-family:var(--display); font-size:clamp(1.3rem,2.8vw,1.9rem); font-style:italic; line-height:1.4; max-width:680px; margin:0 auto; }
   .rulebox .ar { font-family:var(--arabic); color:var(--tint-peach); display:block; margin-top:18px; font-size:1.15rem; }
 
-  .split { display:grid; grid-template-columns:1fr 1fr; gap:40px; align-items:center; margin-top:40px; }
-  @media (max-width:760px){ .split { grid-template-columns:1fr; } }
-  .split ul { list-style:none; display:flex; flex-direction:column; gap:14px; }
-  .split li { padding-left:26px; position:relative; color:var(--slate); }
-  .split li::before { content:'✦'; position:absolute; left:0; color:var(--primary); }
-  .split li strong { color:var(--ink); }
-  .panel { background:var(--surface); border:1px solid var(--hairline); border-radius:18px; padding:22px; font-size:0.85rem; }
-  .panel .line { padding:9px 12px; border-radius:10px; margin-bottom:8px; background:var(--canvas); border:1px solid var(--hairline); }
-  .panel .cite { color:var(--primary); font-weight:600; }
-
-  .pricing { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-top:36px; }
-  .price-card { border:1.5px solid var(--hairline); border-radius:20px; padding:30px; background:var(--soft); }
-  .price-card.featured { border-color:var(--primary); position:relative; }
-  .price-card .flag { position:absolute; top:-12px; left:24px; background:var(--primary); color:var(--on-primary);
-                      font-size:0.72rem; font-weight:700; padding:3px 10px; border-radius:999px; }
-  .price-card h3 { font-family:var(--display); font-size:1.2rem; }
-  .price { font-family:var(--display); font-size:2.1rem; font-weight:640; margin:10px 0 2px; }
-  .price small { font-size:0.85rem; color:var(--steel); font-family:'Inter',sans-serif; font-weight:400; }
-  .price-card ul { list-style:none; margin:18px 0 22px; display:flex; flex-direction:column; gap:9px; color:var(--slate); font-size:0.92rem; }
-  .price-card li::before { content:'✓ '; color:var(--primary); font-weight:700; }
-
-  .final { text-align:center; padding:88px 0; }
-  .final h2 { font-family:var(--display); font-size:clamp(1.9rem,4vw,2.8rem); font-weight:640; }
-  footer.site { border-top:1px solid var(--hairline); padding:30px 0; color:var(--steel); font-size:0.86rem; }
+  .final { text-align:center; padding:84px 0; }
+  .final h2 { font-family:var(--display); font-size:clamp(1.9rem,4vw,2.7rem); font-weight:600; }
+  .final p { color:var(--slate); margin-top:12px; }
+  footer.site { border-top:1px solid var(--hairline); padding:28px 0; color:var(--steel); font-size:0.86rem; }
   footer .wrap { display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; }
   footer a { color:var(--steel); }
 
-  .reveal { opacity:0; transform:translateY(22px); transition:opacity .7s var(--ease), transform .7s var(--ease); }
-  .reveal.in { opacity:1; transform:none; }
-  @media (prefers-reduced-motion:reduce){ .reveal { opacity:1; transform:none; transition:none; } html { scroll-behavior:auto; } }
+  @media (prefers-reduced-motion:no-preference) {
+    .reveal { opacity:0; transform:translateY(18px); transition:opacity .65s var(--ease), transform .65s var(--ease); }
+    .reveal.in { opacity:1; transform:none; }
+  }
 </style>
 </head>
 <body>
@@ -111,11 +103,10 @@
   <div class="wrap nav">
     <div class="brand"><img src="/favicon.svg" alt="Sard logo"><span>Sard</span><span class="ar" lang="ar">سرد</span></div>
     <nav class="nav-links">
-      <a href="#how">How it works</a>
-      <a href="#memory">Memory</a>
-      <a href="#pricing">Pricing</a>
+      <a href="#features">Features</a>
+      <a href="#run">Run it</a>
       <a href="https://github.com/AbdulrahmanAlaasi/sard">GitHub</a>
-      <a class="btn btn-primary" style="padding:9px 16px" href="/">Open Sard</a>
+      <a class="btn btn-primary" style="padding:9px 16px" href="https://github.com/AbdulrahmanAlaasi/sard">Get Sard</a>
     </nav>
   </div>
 </header>
@@ -123,113 +114,82 @@
 <section class="hero wrap">
   <span class="kicker reveal" lang="ar">سرد · the flow of the story</span>
   <h1 class="reveal">Meeting notes that <em>narrate</em> themselves.</h1>
-  <p class="sub reveal">Sard listens so you can stay present. It transcribes in your browser, writes structured notes with your own local AI, and turns conversations into decisions, tasks, and memory your team actually trusts. Every claim is cited to the exact moment it was said.</p>
+  <p class="sub reveal">Sard listens so you can stay present. It transcribes in your browser, writes structured notes with your own local AI, and links every summary, decision, and task to the exact moment it was said. Nothing ever leaves your machine.</p>
   <div class="cta reveal">
-    <a class="btn btn-primary" href="/">Start free, no account needed</a>
-    <a class="btn btn-ghost" href="https://github.com/AbdulrahmanAlaasi/sard">Self-host the backend</a>
+    <a class="btn btn-primary" href="https://github.com/AbdulrahmanAlaasi/sard">Get Sard on GitHub, free</a>
+    <a class="btn btn-ghost" href="#run">Run it in 2 commands</a>
   </div>
-  <p class="microproof reveal">Works with any meeting in a browser tab, in-person recordings, or uploaded audio. No bots joining your calls.</p>
+  <p class="microproof reveal">100% local. No account, no cloud, no telemetry. Open source.</p>
+  <div class="terminal reveal" id="run">
+    <div class="dots"><span></span><span></span><span></span></div>
+    <div><span class="c"># runs entirely on your machine</span></div>
+    <div>git clone https://github.com/AbdulrahmanAlaasi/sard && cd sard</div>
+    <div>npm install && npm run dev</div>
+    <div><span class="c"># open http://localhost:5173 and start a meeting</span></div>
+  </div>
 </section>
 
-<div class="marquee">Private by architecture: audio never leaves your machine. Whisper runs on-device, AI runs on your hardware via Ollama, LM Studio, Jan, or llamafile.</div>
+<div class="marquee">Private by architecture: Whisper transcribes on-device, and notes are written by your own model via Ollama, LM Studio, Jan, or llamafile.</div>
 
-<section class="block wrap" id="how">
-  <h2 class="reveal">Tailored to how meetings actually happen.</h2>
-  <p class="lead reveal">Capture anywhere, then let Sard write the story of the meeting: summary, key points, decisions, and action items.</p>
+<section class="block wrap" id="features">
+  <h2 class="reveal">Everything a notetaker should do, without the cloud.</h2>
+  <p class="lead reveal">Capture the meeting however it happens, then let Sard write its story.</p>
   <div class="cards">
-    <div class="card reveal"><span class="chip c1">🎙️</span><h3>Record the room or the tab</h3><p>Mic for in-person meetings. Tab capture for Zoom and Meet in the browser, mixed with your mic. No setup, no bots.</p></div>
-    <div class="card reveal"><span class="chip c2">✍️</span><h3>On-device transcription</h3><p>Whisper runs inside your browser with an automatic precision fallback, with live progress and a choice of model sizes.</p></div>
-    <div class="card reveal"><span class="chip c3">🧾</span><h3>Notes with receipts</h3><p>Summaries, decisions, and tasks link back to exact transcript moments. If the meeting did not say it, Sard does not claim it. Owners and deadlines are never invented.</p></div>
-    <div class="card reveal"><span class="chip c4">💬</span><h3>Ask the meeting anything</h3><p>Meeting Chat answers only from that meeting's transcript. When the answer is not there, it says so honestly instead of guessing.</p></div>
+    <div class="card reveal"><span class="chip c1">🎙️</span><h3>Record the room or the tab</h3><p>Microphone for in-person meetings. Tab capture for Zoom and Meet in the browser, mixed with your mic. Upload audio or paste a transcript. No bots join your calls.</p></div>
+    <div class="card reveal"><span class="chip c2">✍️</span><h3>On-device transcription</h3><p>Whisper runs inside your browser with an automatic precision fallback, live progress, and a choice of model sizes. The audio never leaves your computer.</p></div>
+    <div class="card reveal"><span class="chip c3">🧾</span><h3>Notes with receipts</h3><p>Summary, key points, decisions, and action items in a clean, Notion-style layout. Owners and due dates are captured when they were said, never invented.</p></div>
+    <div class="card reveal"><span class="chip c4">🗂️</span><h3>A tidy meeting library</h3><p>Meetings grouped by day, full-text search across titles, summaries, and transcripts, editable titles, and one-click Markdown export.</p></div>
   </div>
 </section>
 
-<section class="block wrap" id="memory">
-  <h2 class="reveal">From one meeting to organizational memory.</h2>
-  <p class="lead reveal">Connect your own server and meetings become searchable knowledge, with you in the approval loop.</p>
-  <div class="split">
-    <ul class="reveal">
-      <li><strong>Groups with real context.</strong> Projects, clients, and teams each carry structured context, people, and glossaries that make the AI's output specific instead of generic.</li>
-      <li><strong>Memory you approve.</strong> Sard suggests durable facts; you approve, edit, reject, or mark them temporary. Conflicts appear as cards. Nothing is ever silently overwritten, and history is versioned.</li>
-      <li><strong>Group Intelligence.</strong> Ask questions across a whole group. Answers draw only on approved memory, documents, transcripts, and decisions, with a visible scope indicator.</li>
-      <li><strong>Sharing with boundaries.</strong> External links always expire and serve a summary variant that keeps internal context internal.</li>
-    </ul>
-    <div class="panel reveal" aria-hidden="true">
-      <div class="line">💡 Suggested memory: "Client prefers weekly written status updates." <span class="cite">cited 12:41</span></div>
-      <div class="line">⚖️ Conflict: launch deadline moved from September to October. Keep, replace, or keep both?</div>
-      <div class="line">✅ Approved v2: "Launch deadline is end of October." <span class="cite">history kept</span></div>
-      <div class="line">🔎 "What did we promise the client?" → 3 cited answers from this group only</div>
-    </div>
+<section class="block wrap">
+  <h2 class="reveal">How it works.</h2>
+  <div class="steps">
+    <div class="step reveal"><h3>Capture</h3><p>Record mic or tab audio, upload a file, or paste text.</p></div>
+    <div class="step reveal"><h3>Transcribe</h3><p>Whisper runs in the browser via WebGPU or WASM, with timestamps.</p></div>
+    <div class="step reveal"><h3>Narrate</h3><p>Your local model (auto-detected: Ollama, LM Studio, Jan, llamafile) writes the structured notes.</p></div>
+    <div class="step reveal"><h3>Keep</h3><p>Everything is stored in your browser's local database. Export any meeting as Markdown.</p></div>
   </div>
 </section>
 
 <section class="block wrap">
   <div class="rulebox reveal">
-    <blockquote>"The transcript determines what happened.<br>Approved memory explains why it matters."</blockquote>
-    <span class="ar" lang="ar">النص يحدد ما حدث، والذاكرة المعتمدة تشرح لماذا يهم.</span>
-  </div>
-</section>
-
-<section class="block wrap" id="pricing">
-  <h2 class="reveal">Simple, honest pricing.</h2>
-  <p class="lead reveal">Local mode is free forever. The hosted team workspace is in founding access while we finish the managed cloud.</p>
-  <div class="pricing">
-    <div class="price-card reveal">
-      <h3>Local</h3>
-      <div class="price">$0 <small>forever</small></div>
-      <ul>
-        <li>Unlimited meetings and notes</li>
-        <li>On-device Whisper transcription</li>
-        <li>Your own local AI model</li>
-        <li>No account, no telemetry</li>
-      </ul>
-      <a class="btn btn-ghost" href="/">Open Sard</a>
-    </div>
-    <div class="price-card featured reveal">
-      <span class="flag">FOUNDING ACCESS</span>
-      <h3>Team Cloud</h3>
-      <div class="price">$8 <small>per member / month, planned</small></div>
-      <ul>
-        <li>Groups, approved memory, Group Intelligence</li>
-        <li>Cited decisions, tasks, and commitments</li>
-        <li>Workspace search and expiring share links</li>
-        <li>Managed hosting, or bring your own server free</li>
-      </ul>
-      <a class="btn btn-primary" href="mailto:arkom.293@gmail.com?subject=Sard%20founding%20access">Request founding access</a>
-    </div>
-    <div class="price-card reveal">
-      <h3>Self-hosted</h3>
-      <div class="price">Free <small>open source</small></div>
-      <ul>
-        <li>Full backend: Django + Supabase</li>
-        <li>Structural workspace isolation, tested</li>
-        <li>Your infrastructure, your data residency</li>
-        <li>Ideal for privacy-critical teams</li>
-      </ul>
-      <a class="btn btn-ghost" href="https://github.com/AbdulrahmanAlaasi/sard">Read the docs</a>
-    </div>
+    <blockquote>"The transcript determines what happened."</blockquote>
+    <span class="ar" lang="ar">النص يحدد ما حدث.</span>
   </div>
 </section>
 
 <section class="final wrap">
   <h2 class="reveal">Stop splitting your attention in meetings.</h2>
+  <p class="reveal">Free, open source, and yours. Clone it and run your first meeting in under a minute.</p>
   <div class="cta reveal">
-    <a class="btn btn-primary" href="/">Try Sard now, it is already running in your browser</a>
+    <a class="btn btn-primary" href="https://github.com/AbdulrahmanAlaasi/sard">Get Sard on GitHub</a>
   </div>
 </section>
 
 <footer class="site">
   <div class="wrap">
-    <span>Sard (سرد) · your meetings, narrated</span>
+    <span>Sard (سرد) · your meetings, narrated · runs 100% locally</span>
     <span><a href="https://github.com/AbdulrahmanAlaasi/sard">Open source</a> · built by <a href="https://alaasi.dev">Abdulrahman Alaasi</a></span>
   </div>
 </footer>
 
 <script>
-  const io = new IntersectionObserver((entries) => {
-    for (const e of entries) if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(function (el) { el.classList.add('in'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+      });
+    }, { threshold: 0.1 });
+    els.forEach(function (el) { io.observe(el); });
+    // safety net: never leave the page invisible
+    setTimeout(function () { els.forEach(function (el) { el.classList.add('in'); }); }, 2500);
+  })();
 </script>
 </body>
 </html>

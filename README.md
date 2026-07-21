@@ -1,6 +1,6 @@
 # Sard (سرد) · your meetings, narrated
 
-**Live demo:** https://sard.alaasi.dev · **Primary use:** run it locally (below)
+**Website:** https://sard.alaasi.dev (landing page only) · **The app runs 100% locally** (setup below)
 
 ![Sard screenshot](docs/screenshot.png)
 
@@ -83,8 +83,10 @@ into Settings.
 
 The SPA above is complete on its own. Sard 2.0 adds an **optional** multi-tenant
 backend (Django 6 + DRF + Supabase Postgres/pgvector/Auth) that turns meetings into
-searchable, cited organizational memory. The app shows a "Cloud workspace" panel once
-you point it at a server (sidebar → ☁); until then nothing changes.
+searchable, cited organizational memory. The shipped app is intentionally 100% local
+and does not connect to any server; the backend and its typed client
+(`src/lib/api.ts`, `src/cloud/ui.ts`) exist for self-hosters who want to build on
+the API.
 
 Design docs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/DATA-MODEL.md](docs/DATA-MODEL.md) · [docs/MVP-PLAN.md](docs/MVP-PLAN.md).

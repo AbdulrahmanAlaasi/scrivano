@@ -1,0 +1,28 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>slide2</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap" rel="stylesheet">
+<style>
+  * { margin:0; box-sizing:border-box; }
+  body { width:1200px; height:750px; overflow:hidden; background:#221d16; color:#faf6ef;
+         font-family:'Inter',sans-serif; display:flex; flex-direction:column; align-items:center;
+         justify-content:center; gap:44px; }
+  h1 { font-family:'Fraunces',serif; font-weight:600; font-size:56px; letter-spacing:-0.02em; text-align:center; max-width:880px; line-height:1.15; }
+  .flow { display:flex; align-items:center; gap:22px; }
+  .node { background:#2e2820; border:1.5px solid #57503f; border-radius:18px; padding:24px 30px; text-align:center; }
+  .node .icon { font-size:34px; display:block; margin-bottom:10px; }
+  .node .t { font-size:19px; font-weight:600; }
+  .node .s { font-size:15px; color:#a89d87; margin-top:4px; }
+  .arrow { color:#b3541e; font-size:30px; }
+  .foot { position:absolute; bottom:36px; color:#a89d87; font-size:19px; }
+</style></head><body>
+  <h1>Your audio never leaves your machine.</h1>
+  <div class="flow">
+    <div class="node"><span class="icon">🎙️</span><span class="t">Your meeting</span><div class="s">mic or browser tab</div></div>
+    <span class="arrow">→</span>
+    <div class="node"><span class="icon">✍️</span><span class="t">Whisper</span><div class="s">in your browser</div></div>
+    <span class="arrow">→</span>
+    <div class="node"><span class="icon">🤖</span><span class="t">Your local AI</span><div class="s">Ollama · LM Studio · Jan</div></div>
+    <span class="arrow">→</span>
+    <div class="node"><span class="icon">🗄️</span><span class="t">Your device</span><div class="s">local database</div></div>
+  </div>
+  <div class="foot">No cloud. No account. No bots in your calls. · Sard (سرد)</div>
+</body></html>
