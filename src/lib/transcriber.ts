@@ -44,7 +44,7 @@ async function createPipeline(modelId: string, dtype: Dtype, onProgress: Progres
         onProgress({
           phase: 'loading-model',
           progress: avg,
-          detail: `Downloading speech model${dtype === 'fp32' ? ' (full precision)' : ''} — ${Math.round(avg * 100)}%`,
+          detail: `Downloading speech model${dtype === 'fp32' ? ' (full precision)' : ''}, ${Math.round(avg * 100)}%`,
         });
       }
     },
@@ -77,7 +77,7 @@ async function getPipeline(modelId: string, onProgress: ProgressCallback): Promi
       onProgress({
         phase: 'loading-model',
         progress: -1,
-        detail: 'Optimized model failed on this device — retrying with full precision…',
+        detail: 'Optimized model failed on this device, retrying with full precision…',
       });
     }
   }
@@ -159,7 +159,7 @@ export async function transcribe(
         onProgress({
           phase: 'loading-model',
           progress: -1,
-          detail: 'Optimized model failed on this device — retrying with full precision…',
+          detail: 'Optimized model failed on this device, retrying with full precision…',
         });
         transcriber = (await getPipeline(modelId, onProgress)) as typeof transcriber;
         result = await transcriber(chunk as Float32Array, options);

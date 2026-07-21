@@ -95,7 +95,8 @@ function render() {
       <aside class="sidebar">
         <div class="sidebar-brand">
           <img src="/favicon.svg" alt="" width="24" height="24" />
-          <span>Scrivano</span>
+          <span>Sard</span>
+          <span class="brand-ar" lang="ar">سرد</span>
         </div>
         <button type="button" class="btn btn-primary btn-full" id="new-meeting">+ New meeting</button>
         <input type="search" class="sidebar-search" id="search" placeholder="Search meetings…" value="${escapeHtml(searchQuery)}" aria-label="Search meetings" />
@@ -182,7 +183,7 @@ function renderHome(): string {
     <div class="home">
       <h1>Meeting notes that never leave your machine.</h1>
       <p class="home-sub">
-        Record or import a meeting. Scrivano transcribes it on-device with Whisper and writes
+        Record or import a meeting. Sard transcribes it on-device with Whisper and writes
         Notion-style AI notes with your own local AI model. No cloud, no accounts, no telemetry.
       </p>
       <div class="capture-grid">
@@ -194,7 +195,7 @@ function renderHome(): string {
         <button type="button" class="capture-card tint-sky" id="cap-tab">
           <span class="capture-icon" aria-hidden="true">🖥️</span>
           <span class="capture-title">Record a meeting tab</span>
-          <span class="capture-desc">Zoom / Meet in the browser — captures tab audio + your mic</span>
+          <span class="capture-desc">Zoom / Meet in the browser, captures tab audio + your mic</span>
         </button>
         <button type="button" class="capture-card tint-mint" id="cap-upload">
           <span class="capture-icon" aria-hidden="true">📁</span>
@@ -245,7 +246,7 @@ function renderProcessing(): string {
       <div class="progress-track" role="progressbar" ${pct !== null ? `aria-valuenow="${pct}" aria-valuemin="0" aria-valuemax="100"` : ''}>
         <div class="progress-fill ${pct === null ? 'indeterminate' : ''}" style="${pct !== null ? `width:${pct}%` : ''}"></div>
       </div>
-      <p class="processing-hint">Everything runs locally — nothing is uploaded.</p>
+      <p class="processing-hint">Everything runs locally, nothing is uploaded.</p>
     </div>
   `;
 }
@@ -469,7 +470,7 @@ async function processAudio(blob: Blob, durationSec: number, source: MeetingSour
 
   const meeting: Meeting = {
     id: newMeetingId(),
-    title: `Meeting — ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
+    title: `Meeting, ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
     createdAt: new Date().toISOString(),
     durationSec: Math.round(durationSec),
     source,
@@ -487,7 +488,7 @@ async function processAudio(blob: Blob, durationSec: number, source: MeetingSour
 async function createFromPaste(text: string) {
   const meeting: Meeting = {
     id: newMeetingId(),
-    title: `Meeting — ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
+    title: `Meeting, ${new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`,
     createdAt: new Date().toISOString(),
     durationSec: 0,
     source: 'pasted',
@@ -523,7 +524,7 @@ async function generateNotes(meetingId: string) {
     meeting.notes = { ...parsed.notes!, model, generatedAt: new Date().toISOString() };
 
     // Auto-title untitled meetings.
-    if (meeting.title.startsWith('Meeting — ')) {
+    if (meeting.title.startsWith('Meeting, ')) {
       try {
         const titleRaw = await generate(provider, model, buildTitlePrompt(transcript));
         meeting.title = sanitizeTitle(titleRaw);

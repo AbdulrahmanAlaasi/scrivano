@@ -14,7 +14,7 @@ export function transcriptToText(segments: TranscriptSegment[]): string {
     .trim();
 }
 
-/** Trim an over-long transcript from the middle, keeping the opening and closing —
+/** Trim an over-long transcript from the middle, keeping the opening and closing ,
  * meetings put agendas up front and decisions/wrap-ups at the end. */
 export function fitTranscript(text: string, maxChars: number = MAX_TRANSCRIPT_CHARS): string {
   if (text.length <= maxChars) return text;

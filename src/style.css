@@ -1,26 +1,29 @@
+/* ---------- Sard (سرد) brand tokens: warm paper, dark ink, saffron ---------- */
 :root {
-  --primary: #5645d4;
-  --primary-pressed: #4534b3;
-  --on-primary: #ffffff;
-  --canvas: #ffffff;
-  --surface: #f6f5f4;
-  --surface-soft: #fafaf9;
-  --hairline: #e5e3df;
-  --hairline-strong: #c8c4be;
-  --charcoal: #37352f;
-  --slate: #5d5b54;
-  --steel: #787671;
-  --stone: #a4a097;
-  --success: #1aae39;
-  --error: #e03131;
-  --tint-lavender: #e6e0f5;
-  --tint-sky: #dcecfa;
-  --tint-mint: #d9f3e1;
-  --tint-peach: #ffe8d4;
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --primary: #b3541e;
+  --primary-pressed: #94431a;
+  --on-primary: #fff8ef;
+  --canvas: #faf6ef;
+  --surface: #f2ecdf;
+  --surface-soft: #f7f2e8;
+  --hairline: #e5dcc9;
+  --hairline-strong: #cbbfa6;
+  --charcoal: #221d16;
+  --slate: #57503f;
+  --steel: #7d7460;
+  --stone: #a89d87;
+  --success: #3f7d3a;
+  --error: #b3362a;
+  --tint-lavender: #ece4d2;
+  --tint-sky: #dfe8e4;
+  --tint-mint: #e4e8d4;
+  --tint-peach: #f3e0d0;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-pill: 9999px;
+  --font-display: 'Fraunces', 'Source Serif 4', Georgia, serif;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   color-scheme: light;
 }
 
@@ -52,8 +55,9 @@ h1,
 h2,
 h3 {
   margin: 0;
+  font-family: var(--font-display);
   font-weight: 600;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   color: var(--charcoal);
 }
 
@@ -96,10 +100,17 @@ h3 {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  font-family: 'Source Serif 4', Georgia, serif;
-  font-size: 1.15rem;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
   font-weight: 600;
   padding: 0.15rem 0.25rem;
+}
+
+.sidebar-brand .brand-ar {
+  font-family: 'Noto Naskh Arabic', var(--font-display);
+  color: var(--primary);
+  font-size: 1rem;
+  margin-inline-start: 2px;
 }
 
 .sidebar-brand img {
@@ -880,13 +891,14 @@ h3 {
 
 /* ---------- toast ---------- */
 
-/* ---------- Cloud workspace (Scrivano 2.0, increment 12) ---------- */
+/* ---------- Cloud workspace (Sard 2.0, increment 12) ---------- */
 .cloud-pane {
-  padding: 24px 32px;
+  padding: 28px 36px;
   max-width: 880px;
   margin: 0 auto;
   overflow-y: auto;
   height: 100%;
+  animation: fade-up 0.45s var(--ease-out) both;
 }
 .cloud-header {
   display: flex;
@@ -897,41 +909,86 @@ h3 {
   margin-bottom: 16px;
 }
 .cloud-nav { display: flex; gap: 6px; flex-wrap: wrap; }
-.cloud-hint { color: var(--text-dim, #8a8f98); font-size: 0.9rem; margin: 8px 0; }
+.cloud-hint { color: var(--steel); font-size: 0.9rem; margin: 8px 0; }
 .cloud-form { display: flex; flex-direction: column; gap: 12px; max-width: 420px; }
-.cloud-form label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; }
+.cloud-form label { display: flex; flex-direction: column; gap: 4px; font-size: 0.85rem; color: var(--slate); }
 .cloud-form input,
 .cloud-row input,
 .cloud-row select {
   padding: 8px 10px;
-  border-radius: 8px;
-  border: 1px solid var(--border, #2a2d35);
-  background: var(--bg-raised, #1a1d24);
-  color: inherit;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--hairline);
+  background: var(--canvas);
+  color: var(--charcoal);
   font: inherit;
+  transition: border-color 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out);
+}
+.cloud-form input:focus,
+.cloud-row input:focus,
+.cloud-row select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 .cloud-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
 .cloud-row input { flex: 1; min-width: 160px; }
 .cloud-section { margin-bottom: 28px; }
 .cloud-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
 .cloud-card {
-  border: 1px solid var(--border, #2a2d35);
-  border-radius: 10px;
-  padding: 12px;
-  background: var(--bg-raised, #1a1d24);
+  border: 1px solid var(--hairline);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  background: var(--surface-soft);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
 }
-.cloud-conflict { border-color: #b3862d; }
+.cloud-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(34, 29, 22, 0.08);
+}
+.cloud-conflict { border-color: var(--primary); background: var(--tint-peach); }
 .cloud-table { width: 100%; border-collapse: collapse; }
-.cloud-table td { padding: 6px 8px; border-bottom: 1px solid var(--border, #2a2d35); }
+.cloud-table td { padding: 6px 8px; border-bottom: 1px solid var(--hairline); }
 .btn-small { padding: 4px 10px; font-size: 0.8rem; }
-.btn-link { background: none; border: none; color: var(--accent, #7aa2f7); cursor: pointer; padding: 0; font: inherit; text-align: left; }
+.btn-link { background: none; border: none; color: var(--primary); cursor: pointer; padding: 0; font: inherit; text-align: left; }
 .btn-link:hover { text-decoration: underline; }
-.pill-warn { background: #4a3a12; color: #e8c268; }
+.pill-warn { background: var(--tint-peach); color: var(--primary-pressed); }
 .chat-log { display: flex; flex-direction: column; gap: 10px; margin: 14px 0; }
-.chat-msg { padding: 10px 12px; border-radius: 10px; max-width: 85%; }
-.chat-user { align-self: flex-end; background: var(--accent-dim, #22314f); }
-.chat-assistant { align-self: flex-start; background: var(--bg-raised, #1a1d24); border: 1px solid var(--border, #2a2d35); }
+.chat-msg {
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  max-width: 85%;
+  animation: fade-up 0.3s var(--ease-out) both;
+}
+.chat-user { align-self: flex-end; background: var(--tint-sky); }
+.chat-assistant { align-self: flex-start; background: var(--surface-soft); border: 1px solid var(--hairline); }
 .cloud-body h4 { margin: 18px 0 6px; }
+
+/* ---------- Sard motion system ---------- */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.main-pane > * {
+  animation: fade-up 0.4s var(--ease-out) both;
+}
+.nav-item,
+.btn,
+.pill,
+.tab,
+.ollama-pill {
+  transition: background 0.16s var(--ease-out), color 0.16s var(--ease-out),
+    border-color 0.16s var(--ease-out), transform 0.16s var(--ease-out),
+    box-shadow 0.16s var(--ease-out);
+}
+.btn-primary:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(179, 84, 30, 0.28); }
+.btn-primary:active:not(:disabled) { transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
 
 .toast {
   position: fixed;

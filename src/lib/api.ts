@@ -1,7 +1,7 @@
 /**
- * Scrivano 2.0 backend client (docs/ARCHITECTURE.md §1).
+ * Sard 2.0 backend client (docs/ARCHITECTURE.md §1).
  *
- * Auth is Supabase (password grant via plain fetch — no SDK dependency);
+ * Auth is Supabase (password grant via plain fetch, no SDK dependency);
  * the access token is sent as a Bearer JWT to the Django API. Everything is
  * optional: when no server is configured the app stays fully local-first.
  */
@@ -77,7 +77,7 @@ export interface Excerpt {
 /**
  * Map [n] markers in a model answer back to excerpt citations. Returns the
  * citations actually referenced; an answer with no valid markers has no
- * grounded support and must be sent as not_found (spec §27 — honesty over
+ * grounded support and must be sent as not_found (spec §27, honesty over
  * fluency).
  */
 export function parseCitationMarkers(

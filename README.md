@@ -1,16 +1,16 @@
-# Scrivano
+# Sard (سرد) · your meetings, narrated
 
-**Live demo:** https://scrivano.alaasi.dev · **Primary use:** run it locally (below)
+**Live demo:** https://sard.alaasi.dev · **Primary use:** run it locally (below)
 
-![Scrivano screenshot](docs/screenshot.png)
+![Sard screenshot](docs/screenshot.png)
 
 ## Purpose
 
-Scrivano is a local-first AI meeting-notes app — the Notion AI Notes experience, but
+Sard is a local-first AI meeting-notes app — the Notion AI Notes experience, but
 private. It records meetings (or imports audio / pasted transcripts), transcribes them
 **on-device** with Whisper, and generates structured AI notes — summary, key points,
 action items with owners and due dates, and decisions — using **your own local AI
-model** (Ollama, LM Studio, Jan, llamafile, or any OpenAI-compatible server; Scrivano
+model** (Ollama, LM Studio, Jan, llamafile, or any OpenAI-compatible server; Sard
 auto-detects whichever is running). Nothing ever leaves your machine: no accounts, no
 cloud, no telemetry.
 
@@ -29,7 +29,7 @@ cloud, no telemetry.
 - **On-device transcription** with timestamps, live progress for both model download
   and transcription, and a choice of Whisper sizes (tiny / base / small) in Settings.
   If the optimized (quantized) model fails to load on a device — a known onnxruntime-web
-  issue on some hardware — Scrivano automatically falls back to the full-precision model
+  issue on some hardware — Sard automatically falls back to the full-precision model
   and remembers what worked
 - **AI notes** in Notion's structure: one-paragraph summary, key points, action items
   (with `@owner` and due pills, checkbox state that persists), and decisions — plus
@@ -47,7 +47,7 @@ cloud, no telemetry.
 ## Run it locally (recommended)
 
 ```bash
-git clone https://github.com/AbdulrahmanAlaasi/scrivano.git
+git clone https://github.com/AbdulrahmanAlaasi/sard.git
 cd scrivano
 npm install
 npm run dev        # open http://localhost:5173
@@ -55,7 +55,7 @@ npm run dev        # open http://localhost:5173
 
 ### Set up a local AI server (for AI notes)
 
-Scrivano works with whichever local runtime you already use — it probes the standard
+Sard works with whichever local runtime you already use — it probes the standard
 ports automatically (Ollama `11434`, LM Studio `1234`, Jan `1337`, llamafile `8080`),
 or you can point it at any OpenAI-compatible URL in Settings.
 
@@ -66,22 +66,22 @@ or you can point it at any OpenAI-compatible URL in Settings.
    ```bash
    ollama pull llama3.2
    ```
-2. Make sure it's running. The status pill in Scrivano's sidebar footer turns green.
+2. Make sure it's running. The status pill in Sard's sidebar footer turns green.
 
-**Already using LM Studio / Jan / llamafile?** Just start its local server — Scrivano
+**Already using LM Studio / Jan / llamafile?** Just start its local server — Sard
 finds it. For anything else OpenAI-compatible, paste its base URL (ending in `/v1`)
 into Settings.
 
 > **Using the hosted demo instead?** Browsers block a website from calling a local
 > server unless it allows the origin. For Ollama:
-> `OLLAMA_ORIGINS=https://scrivano.alaasi.dev ollama serve`
-> (Windows PowerShell: `$env:OLLAMA_ORIGINS="https://scrivano.alaasi.dev"; ollama serve`).
+> `OLLAMA_ORIGINS=https://sard.alaasi.dev ollama serve`
+> (Windows PowerShell: `$env:OLLAMA_ORIGINS="https://sard.alaasi.dev"; ollama serve`).
 > LM Studio has a CORS toggle in its server settings. Transcription works on the demo
 > with no setup at all.
 
-## Scrivano 2.0 — optional self-hosted backend (`server/`)
+## Sard 2.0 — optional self-hosted backend (`server/`)
 
-The SPA above is complete on its own. Scrivano 2.0 adds an **optional** multi-tenant
+The SPA above is complete on its own. Sard 2.0 adds an **optional** multi-tenant
 backend (Django 6 + DRF + Supabase Postgres/pgvector/Auth) that turns meetings into
 searchable, cited organizational memory. The app shows a "Cloud workspace" panel once
 you point it at a server (sidebar → ☁); until then nothing changes.

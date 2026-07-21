@@ -1,6 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
-  <rect width="64" height="64" rx="14" fill="#37352f"/>
-  <path d="M20 18h24M20 26h24M20 34h16" stroke="#f6f5f4" stroke-width="4" stroke-linecap="round"/>
-  <path d="M40 50c2-6 6-10 10-11l-8 12-4 1 2-2z" fill="#5645d4"/>
-  <path d="M18 46c4 0 6 4 10 4s6-4 10-4" stroke="#5645d4" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Sard (سرد) mark: a narration stroke, three teeth of س flowing into a bowl -->
+  <rect width="64" height="64" rx="16" fill="#221d16"/>
+  <path d="M15 27 c2 -6 5 -6 7 0 c2 6 5 6 7 0 c2 -6 5 -6 7 0"
+        stroke="#faf6ef" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+  <path d="M46 19 c7 9 5 24 -7 29 c-11 4.5 -22 1 -26 -6"
+        stroke="#faf6ef" stroke-width="3.6" stroke-linecap="round" fill="none"/>
+  <circle cx="51" cy="13" r="3.4" fill="#b3541e"/>
 </svg>

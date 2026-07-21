@@ -1,5 +1,5 @@
 /**
- * Scrivano 2.0 cloud workspace UI (spec §36, MVP increment 12).
+ * Sard 2.0 cloud workspace UI (spec §36, MVP increment 12).
  *
  * Entirely additive: the local-first experience is untouched. This panel
  * appears when the user configures a backend; it renders ONLY what the API
@@ -113,8 +113,8 @@ export class CloudPanel {
     const c = this.deps.container;
     switch (this.route.page) {
       case 'setup':
-        c.innerHTML = `${this.header('Connect Scrivano Cloud')}
-          <p class="cloud-hint">Point Scrivano at your own backend. Transcription and AI stay local —
+        c.innerHTML = `${this.header('Connect Sard Cloud')}
+          <p class="cloud-hint">Point Sard at your own backend. Transcription and AI stay local ,
           the server stores transcripts, groups, and approved memory. Leave local mode any time.</p>
           <form class="cloud-form" data-form="setup">
             <label>API server URL<input name="apiUrl" placeholder="http://localhost:8000" required></label>
@@ -205,7 +205,7 @@ export class CloudPanel {
         break;
       }
       case 'review': {
-        c.innerHTML = `${this.header(`Memory review — ${this.route.group.name}`)}
+        c.innerHTML = `${this.header(`Memory review, ${this.route.group.name}`)}
           <div class="cloud-body" id="cloud-review-body"><p class="cloud-hint">Loading…</p></div>`;
         void this.renderReview(this.route.group);
         break;
@@ -232,7 +232,7 @@ export class CloudPanel {
       [
         section('Summary', intel.summary_sections.map((s) => `<li><em>${esc(s.kind)}</em>: ${esc(s.body)}</li>`)),
         section('Decisions', intel.decisions.map((d) => `<li>${esc(d.statement)} <span class="pill">${esc(d.status)}</span></li>`)),
-        section('Tasks', intel.tasks.map((t) => `<li>${esc(t.title)} — ${t.owner_name ? esc(t.owner_name) : '<em>unassigned</em>'}${t.due_date ? ` · due ${esc(t.due_date)}` : ''} <span class="pill">${esc(t.status)}</span></li>`)),
+        section('Tasks', intel.tasks.map((t) => `<li>${esc(t.title)}, ${t.owner_name ? esc(t.owner_name) : '<em>unassigned</em>'}${t.due_date ? ` · due ${esc(t.due_date)}` : ''} <span class="pill">${esc(t.status)}</span></li>`)),
         section('Commitments', intel.commitments.map((x) => `<li>${esc(x.text)}</li>`)),
         section('Questions', intel.questions.map((x) => `<li>${esc(x.text)} <span class="pill">${esc(x.status)}</span></li>`)),
         section('Risks', intel.risks.map((x) => `<li>${esc(x.risk)}</li>`)),
@@ -255,7 +255,7 @@ export class CloudPanel {
       })
       .join('');
     body.innerHTML = `
-      <p class="cloud-hint">Answers come from your local AI over this meeting's transcript only — nothing else. Uncited answers are refused.</p>
+      <p class="cloud-hint">Answers come from your local AI over this meeting's transcript only, nothing else. Uncited answers are refused.</p>
       <div class="chat-log">${log}</div>
       <form class="cloud-row" data-form="chat" data-meeting="${m.id}">
         <input name="q" placeholder="Ask about this meeting…" required ${this.busy ? 'disabled' : ''}>
@@ -442,7 +442,7 @@ export class CloudPanel {
       const settings = this.deps.getSettings();
       const provider = await detectProvider(settings.llmUrl);
       if (!provider.reachable) {
-        this.deps.onToast('No local AI provider reachable — start Ollama/LM Studio to use Meeting Chat.');
+        this.deps.onToast('No local AI provider reachable, start Ollama/LM Studio to use Meeting Chat.');
         return;
       }
       const model = settings.llmModel || provider.models[0] || '';
@@ -450,7 +450,7 @@ export class CloudPanel {
       const answerText = raw.trim();
       const notFound = answerText.includes('NOT_FOUND') || ask.excerpts.length === 0;
       const citations = notFound ? [] : parseCitationMarkers(answerText, ask.excerpts);
-      // an uncited "answer" is not an answer — degrade honestly (spec §27)
+      // an uncited "answer" is not an answer, degrade honestly (spec §27)
       const finalNotFound = notFound || citations.length === 0;
       const message = await this.client.chatAnswer(
         meeting.id,

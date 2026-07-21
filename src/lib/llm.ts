@@ -1,7 +1,7 @@
 /**
- * Provider-agnostic local LLM client. Scrivano is not tied to any one runtime:
+ * Provider-agnostic local LLM client. Sard is not tied to any one runtime:
  * it speaks Ollama's native API and the OpenAI-compatible API served by
- * LM Studio, Jan, llamafile, vLLM, LocalAI, and others — and auto-detects
+ * LM Studio, Jan, llamafile, vLLM, LocalAI, and others, and auto-detects
  * whichever is running.
  */
 
@@ -62,7 +62,7 @@ async function probe(url: string, kind: ProviderKind, label: string): Promise<Pr
 }
 
 const OFFLINE_ERROR =
-  'No local AI server found. Start Ollama, LM Studio, Jan, or any OpenAI-compatible server — or set its URL in Settings. If you opened Scrivano from a website (not localhost), the server must allow this origin (see README).';
+  'No local AI server found. Start Ollama, LM Studio, Jan, or any OpenAI-compatible server, or set its URL in Settings. If you opened Sard from a website (not localhost), the server must allow this origin (see README).';
 
 /**
  * Find a local AI server. If customUrl is set, only that URL is probed (as both API
