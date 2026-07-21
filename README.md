@@ -48,7 +48,7 @@ cloud, no telemetry.
 
 ```bash
 git clone https://github.com/AbdulrahmanAlaasi/sard.git
-cd scrivano
+cd sard
 npm install
 npm run dev        # open http://localhost:5173
 ```
@@ -81,12 +81,13 @@ into Settings.
 
 ## Sard 2.0 — optional self-hosted backend (`server/`)
 
-The SPA above is complete on its own. Sard 2.0 adds an **optional** multi-tenant
-backend (Django 6 + DRF + Supabase Postgres/pgvector/Auth) that turns meetings into
-searchable, cited organizational memory. The shipped app is intentionally 100% local
-and does not connect to any server; the backend and its typed client
-(`src/lib/api.ts`, `src/cloud/ui.ts`) exist for self-hosters who want to build on
-the API.
+The SPA above is complete on its own. Sard 2.0 adds an **optional** backend that
+turns meetings into searchable, cited organizational memory: groups, approved
+memory, strictly isolated Meeting Chat, and search. It runs on YOUR machine too:
+start it with the commands below and click **🗂 Local workspace** in the app's
+sidebar. In local mode (`LOCAL_AUTH`, the default) you sign in with just an
+email; the server issues its own private token and nothing touches the cloud.
+Self-hosters can instead wire real Supabase auth + Postgres/pgvector.
 
 Design docs: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) ·
 [docs/DATA-MODEL.md](docs/DATA-MODEL.md) · [docs/MVP-PLAN.md](docs/MVP-PLAN.md).
@@ -120,7 +121,7 @@ EMBEDDINGS_URL=http://localhost:11434
 EMBEDDINGS_MODEL=nomic-embed-text
 ```
 
-Backend tests (58, isolation-focused): `DATABASE_URL=sqlite:///db.sqlite3 python -m pytest`
+Backend tests (60, isolation-focused): `DATABASE_URL=sqlite:///db.sqlite3 python -m pytest`
 
 ### API surface (all under `/api/`, Supabase JWT bearer auth)
 
